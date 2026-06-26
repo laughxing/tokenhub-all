@@ -22,7 +22,7 @@ Agent 推进产品需求时，按以下顺序读取上下文：
 3. 当前需求包：`product/tokenhub-product/docs/roadmaps/<roadmap-id>/requirements/REQ-*/`
 4. 目标子仓的 `AGENTS.md`
 
-Roadmap 只描述阶段期望和本阶段需求。具体需求输入放在需求包 `README.md`，验收输入放在 `acceptance.md`，Agent 实际执行总结和验证记录放在 `output/changes.md` 与 `output/verified.md`。
+Roadmap 只描述阶段期望和本阶段需求。具体需求输入放在需求包 `README.md`，验收输入放在 `acceptance.md`，Agent 实际执行总结和验收结果放在 `output/changes.md` 与 `output/acceptance-results.md`；只有需求未完成、被阻塞或需要人工关注时，才额外创建 `output/handoff.md`。
 
 ## 子仓库路由
 
