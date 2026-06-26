@@ -9,6 +9,17 @@
 3. 不要在大仓根目录直接新增业务逻辑、测试代码、部署配置或产品文档。
 4. 如果任务跨多个子仓库，先说明变更边界和执行顺序，避免把跨仓共识散落在代码仓库里。
 
+## 产品迭代入口
+
+Agent 推进产品需求时，按以下顺序读取上下文：
+
+1. 产品级 SOP：`product/tokenhub-product/docs/guides/agent-product-iteration-sop.md`
+2. 当前 roadmap：`product/tokenhub-product/docs/roadmaps/`
+3. 当前需求包：`product/tokenhub-product/docs/roadmaps/<roadmap-id>/requirements/REQ-*/`
+4. 目标子仓的 `AGENTS.md`
+
+Roadmap 只描述阶段期望和本阶段需求。具体需求输入放在需求包 `README.md`，验收输入放在 `acceptance.md`，Agent 实际执行总结和验证记录放在 `output/changes.md` 与 `output/verified.md`。
+
 ## 子仓库路由
 
 | 路径 | 归属 | 处理内容 |
@@ -37,7 +48,7 @@
 
 ## 文档归属
 
-1. 平台级架构、产品需求和迭代计划放在 `product/tokenhub-product/docs/`。
+1. 平台级架构、roadmap、产品需求和 Agent output 放在 `product/tokenhub-product/docs/`。
 2. 代码实现细节放在对应 `dev/*` 子仓库。
 3. 部署、运维和发布说明放在 `deploy/tokenhub-deploy`。
 4. 根目录文档只保留大仓导航和 Agent 规则，不承载产品说明书。
@@ -47,5 +58,6 @@
 TokenHub 是基于 LiteLLM 的 LLM API 平台。排查或设计跨仓功能时，优先从这些入口获取上下文：
 
 - 平台架构：`product/tokenhub-product/docs/architecture/llm-api-platform-architecture.md`
-- 迭代规划：`product/tokenhub-product/docs/iterations/`
+- 产品迭代 SOP：`product/tokenhub-product/docs/guides/agent-product-iteration-sop.md`
+- Roadmap：`product/tokenhub-product/docs/roadmaps/`
 - Proxy 架构：`dev/tokenhub-proxy/ARCHITECTURE.md`
