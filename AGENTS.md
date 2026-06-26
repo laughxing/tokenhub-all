@@ -1,70 +1,51 @@
-# TokenHub 大仓 (tokenhub-all)
+# TokenHub Agent 指引
 
-## 概述
+本仓库是 TokenHub 的大仓入口，只负责聚合和管理子仓库。根目录不放业务代码；除维护 `AGENTS.md`、`Makefile` 等大仓元数据外，所有实现、测试、文档变更都应进入对应子仓库。
 
-本仓库是 **TokenHub 大仓（Monorepo Meta-Repository）**，用于统一拉取和管理工作区内所有相关子仓库，按 **开发（dev）、产品文档（product）、部署（deploy）** 分类组织。
+## 工作边界
 
-TokenHub 是一个 LLM API 平台，基于 LiteLLM 构建 AI Gateway，提供统一的模型接入、API Key 管理、用量计费、限流等能力。
+1. 开始任务前先判断归属目录：`dev/`、`product/` 或 `deploy/`。
+2. 进入目标子仓库后，优先阅读该仓库自己的 `AGENTS.md`、`CLAUDE.md`、`README.md` 或架构文档，并以子仓库规则为准。
+3. 不要在大仓根目录直接新增业务逻辑、测试代码、部署配置或产品文档。
+4. 如果任务跨多个子仓库，先说明变更边界和执行顺序，避免把跨仓共识散落在代码仓库里。
 
-> 本仓库根目录**不包含业务代码**，只维护大仓元数据（`AGENTS.md`、`Makefile` 等）。实际开发请在对应子仓库目录下进行。
+## 子仓库路由
 
-## 目录分类
+| 路径 | 归属 | 处理内容 |
+|------|------|----------|
+| `dev/tokenhub-proxy` | 后端 | LiteLLM Gateway、Proxy、管理 API、后端单元测试 |
+| `dev/tokenhub-web` | 前端 | Web 控制台、官网、BFF 层 |
+| `dev/tokenhub-e2e` | 测试 | 跨服务 E2E、Robot Framework 自动化测试 |
+| `product/tokenhub-product` | 产品文档 | 产品需求、跨仓架构、迭代规划、平台级共识 |
+| `deploy/tokenhub-deploy` | 部署 | K8s、Helm、CI/CD、运行手册 |
 
-| 分类 | 用途 |
-|------|------|
-| `dev/` | 开发相关：核心服务、Web 控制台、E2E / Robot 自动化测试 |
-| `product/` | 产品文档系统（面向产品、运营、跨仓架构与迭代规划，非代码仓库） |
-| `deploy/` | 部署与运维配置 |
+新增子仓库时，同步更新 `Makefile` 的 `REPOS` 变量和本表。
 
-## 子仓库清单
+## Git 与命令
 
-| 本地路径 | 远程仓库 | 分类 | 说明 |
-|----------|----------|------|------|
-| `dev/tokenhub-proxy` | [tokenhub-proxy](https://github.com/laughxing/tokenhub-proxy) | 开发 | 核心后端：LiteLLM Gateway、Proxy、管理 API |
-| `dev/tokenhub-web` | [tokenhub-web](https://github.com/laughxing/tokenhub-web) | 开发 | Web 控制台、官网、BFF 层 |
-| `dev/tokenhub-e2e` | [tokenhub-e2e](https://github.com/laughxing/tokenhub-e2e) | 开发 | E2E / Robot Framework 自动化测试 |
-| `product/tokenhub-product` | [tokenhub-product](https://github.com/laughxing/tokenhub-product) | 产品文档 | 产品文档、跨仓架构、需求与迭代规划 |
-| `deploy/tokenhub-deploy` | [tokenhub-deploy](https://github.com/laughxing/tokenhub-deploy) | 部署 | 部署配置、K8s/Helm、CI/CD |
+1. 每个子仓库都有独立 Git 历史。提交、查看 diff、运行测试时，必须在目标子仓库目录下执行。
+2. 不要在大仓根目录提交子仓库业务变更。
+3. 使用 `make status` 查看所有子仓库状态；使用 `make sync`、`make clone`、`make pull` 同步仓库。
+4. `dev/tokenhub-web` 通过 git submodule 引用 `tokenhub-proxy`；需要同步时，在 `dev/tokenhub-web` 内执行 `git submodule update --init --recursive`。
 
-新增子仓库时，同步更新 `Makefile` 中的 `REPOS` 变量和本表。
+## 测试归属
 
-## 快速开始
+1. 后端单元测试放在 `dev/tokenhub-proxy`。
+2. 前端相关测试放在 `dev/tokenhub-web`，遵循该仓库现有测试体系。
+3. 跨服务端到端验证放在 `dev/tokenhub-e2e`。
+4. 修改共享契约时，优先补充最靠近变更点的测试，再按风险补充跨服务验证。
 
-```bash
-make help    # 查看可用命令
-make sync    # 首次 clone 并 pull 所有子仓库（推荐）
-make clone   # 仅克隆尚未存在的子仓库
-make pull    # 拉取已克隆子仓库的最新代码
-make status  # 查看各子仓库 git 状态
-```
+## 文档归属
 
-## Agent 工作指引
+1. 平台级架构、产品需求和迭代计划放在 `product/tokenhub-product/docs/`。
+2. 代码实现细节放在对应 `dev/*` 子仓库。
+3. 部署、运维和发布说明放在 `deploy/tokenhub-deploy`。
+4. 根目录文档只保留大仓导航和 Agent 规则，不承载产品说明书。
 
-1. **先确认目标子仓库** — 改代码前明确属于 dev / product / deploy 哪一类，进入对应目录工作。
-2. **子仓库独立 Git 历史** — 每个子目录有自己的 `.git`，`git commit` 需在子仓库目录下执行，而非大仓根目录。
-3. **架构与规范** — 平台级架构和阶段规划见 `product/tokenhub-product/docs/`；Proxy 实现架构见 `dev/tokenhub-proxy/ARCHITECTURE.md`；开发规范见各子仓库的 `AGENTS.md` / `CLAUDE.md`。
-4. **Submodule 注意** — `dev/tokenhub-web` 通过 git submodule 引用 `tokenhub-proxy`；同步 submodule 时在 `tokenhub-web` 目录执行 `git submodule update --init --recursive`。
-5. **测试代码归属** — 单元测试保留在 `dev/tokenhub-proxy` 内；跨服务 E2E / Robot 自动化测试放在 `dev/tokenhub-e2e`。
-6. **文档归属** — 跨仓共识放 `product/tokenhub-product`，代码实现细节放对应 `dev/*` 子仓库，部署运行手册放 `deploy/tokenhub-deploy`，大仓根目录只放导航和规则。
-7. **大仓根目录职责** — 仅维护仓库清单、拉取脚本和 Agent 指引，不在此直接修改业务逻辑。
+## 架构入口
 
-## 架构概览
+TokenHub 是基于 LiteLLM 的 LLM API 平台。排查或设计跨仓功能时，优先从这些入口获取上下文：
 
-```text
-User / SDK
-  -> APISIX（边缘网关）
-  -> LiteLLM Proxy（dev/tokenhub-proxy）
-  -> upstream model providers
-
-Browser
-  -> APISIX
-  -> Web Console / BFF（dev/tokenhub-web）
-  -> LiteLLM management APIs
-```
-
-- **APISIX**：TLS、路由、CORS、WAF、限流等边缘能力
-- **LiteLLM（tokenhub-proxy）**：虚拟 API Key、组织/团队、预算、用量、模型路由
-- **Web Console（tokenhub-web）**：产品层 UI，封装 LiteLLM 管理 API
-- **E2E 测试（tokenhub-e2e）**：端到端与 Robot 自动化测试，验证 Proxy + Web 集成行为
-
-详细平台架构决策见 `product/tokenhub-product/docs/architecture/llm-api-platform-architecture.md`。
+- 平台架构：`product/tokenhub-product/docs/architecture/llm-api-platform-architecture.md`
+- 迭代规划：`product/tokenhub-product/docs/iterations/`
+- Proxy 架构：`dev/tokenhub-proxy/ARCHITECTURE.md`
