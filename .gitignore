@@ -1,0 +1,4 @@
+# 子仓库由 make clone 拉取，不纳入大仓 git 跟踪
+/dev/
+/product/
+/deploy/
